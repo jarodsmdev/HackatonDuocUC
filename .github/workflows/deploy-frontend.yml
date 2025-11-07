@@ -23,6 +23,7 @@ jobs:
             with:
                 node-version: 20
                 cache: "npm"
+                cache-dependency-path: './FRONTEND/package-lock.json'
 
           - name: Install project dependencies
             working-directory: ./FRONTEND
