@@ -1,31 +1,38 @@
-// props esperadas ahora:
-export default function TemporalAnalysis({ data }: { data: {
-  criticalHours: string[],
-  causes: { label: string, pct: number }[]
-} }) {
+// src/components/TemporalAnalysis.tsx
+import React from 'react'
+
+type TemporalPoint = {
+  t: string
+  v: number
+}
+
+type TemporalAnalysisProps = {
+  data?: {
+    scoreSeries?: TemporalPoint[]
+  }
+}
+
+export default function TemporalAnalysis({ data }: TemporalAnalysisProps) {
+  // Evitar error si data o scoreSeries no existen
+  if (!data || !Array.isArray(data.scoreSeries)) {
+    return (
+      <div className="card">
+        <h3>Análisis Temporal</h3>
+        <p>No hay datos de riesgo temporal disponibles.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="card">
-      <h3>Horarios y causas</h3>
-      <div className="card-grid">
-        <div className="card">
-          <h3>Horarios críticos</h3>
-          <div className="row" style={{flexWrap:'wrap', gap:8}}>
-            {data.criticalHours.map(h => <span key={h} className="tag">{h} hrs</span>)}
-          </div>
-        </div>
-        <div className="card">
-          <h3>Causas principales</h3>
-          <table className="table">
-            <thead><tr><th>Causa</th><th style={{textAlign:'right'}}>%</th></tr></thead>
-            <tbody>
-              {data.causes.map(c=>(
-                <tr key={c.label}><td>{c.label}</td><td style={{textAlign:'right'}}>{c.pct}%</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <p style={{color:'#a9b3d8', fontSize:12}}>Template en espera de API.</p>
+      <h3>Análisis Temporal</h3>
+      <ul>
+        {data.scoreSeries.map((p, i) => (
+          <li key={i}>
+            <strong>{new Date(p.t).toLocaleString()}:</strong> {(p.v * 100).toFixed(2)}%
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
