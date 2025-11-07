@@ -55,3 +55,9 @@ Una vez que la API esté en funcionamiento, puedes acceder a la documentación i
 ```
 http://localhost:8000/docs
 ```
+Links utiles de data:
+- [Repositorio de datos de accidentes de tráfico en Chile](https://ideocuc-ocuc.hub.arcgis.com/datasets/bbc4e4f6fc3a4490ae7dac787b90dafd_0/explore?location=-33.620611%2C-70.738368%2C9.93)
+- [Repositorio alternativo de datos de accidentes de tráfico en Chile](https://mapas-conaset.opendata.arcgis.com/search
+  
+Como esta desplegado frontend:
+- [Frontend desplegado en Vercel](https://smartcitiesvina.netlify.app/)
