@@ -21,11 +21,12 @@ models_loaded = []
 # --- Modelos Pydantic para la data ---
 # Esto define la entrada para una predicción
 class AccidentInput(BaseModel):
-    comuna: str
+    comuna: float
     region: str
     tipo_accidente: str
     leves: int = 0
     fecha: str # Espera formato "YYYY-MM-DD"
+    clase_accid: str = "Accidente"
 
 # Esto define la entrada para el endpoint batch
 class BatchInput(BaseModel):
@@ -80,9 +81,18 @@ def preprocess_data(data: pd.DataFrame) -> pd.DataFrame:
     rename_map = {
         "comuna": "Comuna",
         "region": "Región",
-        "tipo_accidente": "TipoAccidente",
+        "tipo_accidente": "TipoAccidente"
     }
     data = data.rename(columns=rename_map)
+
+    if "Claseaccid" not in data.columns:
+        data["Claseaccid"] = "Accidente"  # valor por defecto
+        print("🔍 Claseaccid creada con valor por defecto")
+
+    # Y si está en CAT_COLS, asegurarse de que existe
+    if "Claseaccid" not in CAT_COLS and "Claseaccid" in data.columns:
+        CAT_COLS.append("Claseaccid")
+
 
     # --- 2. Ingeniería de Fechas (como en tu script) ---
     data["Fecha"] = pd.to_datetime(data["fecha"], errors='coerce')
@@ -99,9 +109,43 @@ def preprocess_data(data: pd.DataFrame) -> pd.DataFrame:
     # Aplicar el scaler GUARDADO
     data[NUM_COLS] = scaler.transform(data[NUM_COLS])
 
-    # --- 4. Dummies Categóricas (como en tu script) ---
+    # Convertir Comuna a string para que get_dummies funcione
+    if "Comuna" in data.columns:
+        data["Comuna"] = "Comuna_" + data["Comuna"].astype(str)
+        print("🔍 Comuna convertida a string:", data["Comuna"].iloc[0])
+
+    # Luego aplicar dummies normal
     data[CAT_COLS] = data[CAT_COLS].fillna("desconocido")
     processed_df = pd.get_dummies(data[CAT_COLS + NUM_COLS])
+
+    # --- 4. Dummies Categóricas (como en tu script) ---
+    # DEBUG NUCLEAR
+    print("="*50)
+    print("🔍 DEBUG - PREPROCESAMIENTO")
+    print("🔍 Comuna value:", data["Comuna"].iloc[0] if "Comuna" in data.columns else "NO EXISTE")
+    print("🔍 Comuna dtype:", data["Comuna"].dtype if "Comuna" in data.columns else "NO EXISTE")
+    print("🔍 CAT_COLS:", CAT_COLS)
+    
+    # Aplicar dummies
+    data[CAT_COLS] = data[CAT_COLS].fillna("desconocido")
+    processed_df = pd.get_dummies(
+    data[CAT_COLS + NUM_COLS], 
+    prefix=['' if col == 'Comuna' else col for col in CAT_COLS],
+    prefix_sep=''
+    )
+    
+    print("🔍 Columnas generadas después de dummies:")
+    for col in processed_df.columns:
+        if "Comuna" in col:
+            print(f"   - {col}")
+    
+    print("🔍 Columnas que espera el modelo:")
+    for col in FEATURE_COLS_POST_DUMMIES:
+        if "Comuna_" in col:
+            print(f"   - {col}")
+            break  # solo mostrar una para ejemplo
+    
+    print("="*50)
     
     # --- 5. Alinear Columnas (Crucial) ---
     # Reindexa el DF para que tenga EXACTAMENTE las mismas columnas

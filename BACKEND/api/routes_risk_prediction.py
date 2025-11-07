@@ -49,12 +49,15 @@ async def predict_single(data: AccidentInput):
     try:
         # 1. Convertir Pydantic a DataFrame
         input_df = pd.DataFrame([data.model_dump()])
+        print("INPUT:", input_df)
         
         # 2. Preprocesar
         processed_df = preprocess_data(input_df)
+        print("PROCESSED:", processed_df)
         
         # 3. Predecir
         score = get_prediction(processed_df)[0]
+        print(f"Predicted score: {score}")
         
         # 4. Formatear respuesta (cumpliendo con la Hackathon)
         risk_level = "ALTO" if score > 0.5 else ("MEDIO" if score > 0.25 else "BAJO")
