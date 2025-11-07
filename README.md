@@ -61,3 +61,4 @@ Links utiles de data:
   
 Como esta desplegado frontend:
 - [Frontend desplegado en Vercel](https://smartcitiesvina.netlify.app/)
+- [Enlace a Trello](https://trello.com/b/MjF4hXZK/sprint-smart-cities)
