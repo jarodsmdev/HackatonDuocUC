@@ -60,5 +60,40 @@ Links utiles de data:
 - [Repositorio alternativo de datos de accidentes de tráfico en Chile](https://mapas-conaset.opendata.arcgis.com/search
   
 Como esta desplegado frontend:
-- [Frontend desplegado en Vercel](https://smartcitiesvina.netlify.app/)
+- [Frontend desplegado en Netlify](https://smartcitiesvina.netlify.app/)
 - [Enlace a Trello](https://trello.com/b/MjF4hXZK/sprint-smart-cities)
+
+## Informe técnico
+
+#### Backend
+•	Lenguaje: Python
+•	Framework web: FastAPI
+•	Servidor ASGI: Uvicorn
+•	Cliente OpenAI: openai (encapsulado en src/gpt_client.py)
+•	Carga de variables de entorno: python-dotenv (.env)
+•	Gestión CORS: CORSMiddleware (en app/main.py)
+•	Concurrencia: asyncio (uso de asyncio.to_thread en /api/coach)
+•	Entrypoint dev: run.py
+•	Endpoints principales: POST /api/predict, POST /api/coach
+•	Docker: Dockerfile + docker-compose.yml (usa env_file: .env)
+•	Dependencias: requirements.txt
+•	Estructura clave: app/main.py, api/routes_predict.py, api/routes_coach.py, src/gpt_client.py, .env, run.py, Dockerfile
+
+### Frontend
+
+* Lenguaje: TypeScript
+* Framework UI: React
+* Bundler / Dev server: Vite (dev port: 5173)
+* Entrypoint: main.tsx → monta App.tsx
+* Estilos: CSS global (src/styles.css) + variables de tema (src/theme.tsx)
+* Modos de tema: claro / oscuro / daltónico (Okabe–Ito) — guardado en localStorage
+* Mapas: Leaflet + react-leaflet (componente: src/components/MapView.tsx)
+* Gráficas / KPIs: Recharts
+* Reportes / PDF: jsPDF + jspdf-autotable (src/utils/report.ts)
+* STT / TTS: Web Speech API (SpeechRecognition) y speechSynthesis (implementado en src/components/AgentQuery.tsx)
+* Utilidades: funciones compartidas en utils.ts y tipos en types.ts
+* Componentes principales: Navbar, AgentQuery, AgentProposals, CriticalRoutesTable, TemporalAnalysis (src/components/)
+* Scripts npm: dev (vite), build (tsc -b && vite build), preview (vite) — package.json
+* Salida de build: index.html y dist/assets (generado por vite build)
+* Estructura clave: src/main.tsx, src/App.tsx, src/theme.tsx, src/styles.css, src/components/, report.ts
+* Cómo ejecutar: npm install && npm run dev (abrir http://localhost:5173)
