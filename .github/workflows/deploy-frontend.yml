@@ -1,11 +1,8 @@
 name: Build and deploy to Netlify
 
 on:
-  workflow_run:
-    workflows: ["Deploy to AWS EC2"]
-    types:
-      - completed
-  workflow_dispatch:  #Permite ejecución manual
+  push:
+    branches: [ "main" ]
 
 jobs:
   deploy-frontend:
