@@ -26,9 +26,8 @@ jobs:
                 cache: "npm"
 
           - name: Install project dependencies
-            run: |
-              cd FRONTEND
-              npm install
+            working-directory: ./FRONTEND
+            run: npm install
 
           - name: Build the project
             run: |
@@ -36,6 +35,7 @@ jobs:
               npm run build
 
           - name: Deploy to Netlify
+            working-directory: ./FRONTEND
             run: npx netlify deploy --prod --dir=dist --site=$NETLIFY_SITE_ID
             env:
                 NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
