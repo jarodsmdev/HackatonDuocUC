@@ -1,0 +1,64 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.AWS_EC2_SSH_KEY }}
+
+      - name: Copy project to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "mkdir -p ~/app"
+          # Copiar solo el directorio BACKEND
+          rsync -avz \
+            --exclude='.git' \
+            --exclude='FRONTEND' \
+            --exclude='CARTERO' \
+            ./BACKEND/ ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:~/app/
+
+      - name: Build and run Docker container on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
+          cd ~/app
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+          echo "OPENAI_SYSTEM_PROMPT=${{ secrets.OPENAI_SYSTEM_PROMPT }}" >> .env
+          
+          # Actualizar e instalar Docker si no está presente
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+          # Agregar repositorio de Docker
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+
+          # Instalar Docker
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+          # Iniciar el servicio de Docker
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+          # Detener contenedores existentes
+          sudo docker compose down || true
+
+          # Levantar contenedor usando docker compose
+          sudo docker compose up -d --build
+          sudo rm .env
+          EOF
