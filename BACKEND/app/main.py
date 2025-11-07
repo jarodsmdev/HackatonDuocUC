@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes_predict import router as predict_router
 from api.routes_coach import router as coach_router
-from api.routes_history import router as history_router 
+from api.routes_history import router as history_router
+from api import routes_risk_prediction
 from src.database import init_db
 
 # Agregar el directorio src al path
@@ -42,6 +43,7 @@ def startup_event():
 app.include_router(predict_router, prefix="/api/v1")
 app.include_router(coach_router, prefix="/api/v1")
 app.include_router(history_router, prefix="/api/v1")
+app.include_router(routes_risk_prediction.router)
 
 @app.get("/")
 async def root():

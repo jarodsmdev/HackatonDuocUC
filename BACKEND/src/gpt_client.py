@@ -13,8 +13,6 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_SYSTEM_PROMPT = os.getenv("OPENAI_SYSTEM_PROMPT")
 
-print(f"DEBUG: OPENAI_SYSTEM_PROMPT={OPENAI_SYSTEM_PROMPT}")
-
 if not OPENAI_API_KEY:
     raise RuntimeError("Falta OPENAI_API_KEY en las variables de entorno")
 
