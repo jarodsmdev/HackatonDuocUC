@@ -2,9 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 
 smartcities.db
-/node_modules
+node_modules
 CARTERO/
 BACKEND/DOCS/
+/dist
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
