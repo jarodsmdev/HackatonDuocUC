@@ -30,9 +30,8 @@ jobs:
             run: npm install
 
           - name: Build the project
-            run: |
-              cd FRONTEND
-              npm run build
+            working-directory: ./FRONTEND
+            run: npm run build
 
           - name: Deploy to Netlify
             working-directory: ./FRONTEND
